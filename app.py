@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request, session, jsonify
 from boggle import Boggle
-
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+boggle_game = Boggle()
 
 
 @app.route('/')
 def home():
     """Show and generate board."""
 
-    board = Boggle().make_board()
+    board = boggle_game.make_board()
     session["board"] = board
     highscore = session.get("highscore", 0)
     nplays = session.get("nplays", 0)
@@ -24,7 +25,7 @@ def check_word():
 
     word = request.args["word"]
     board = session["board"]
-    response = Boggle().check_valid_word(board, word)
+    response = boggle_game.check_valid_word(board, word)
 
     return jsonify({'result': response})
 
